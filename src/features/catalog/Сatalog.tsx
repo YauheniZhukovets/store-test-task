@@ -2,10 +2,19 @@ import React from 'react';
 import {AppBar, Box, Button, Container, Grid, IconButton, Toolbar, Typography} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {Product} from './product/Product';
-import {NavLink} from 'react-router-dom';
+import {Navigate, NavLink} from 'react-router-dom';
+import {useAppSelector} from '../../utils/redux-utils';
+import {selectIsLoggedIn} from '../auth/selectors';
+import {PATH} from '../../app/App';
 
 
 export const Catalog = () => {
+    const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
+    if (!isLoggedIn) {
+        return <Navigate to={PATH.LOGIN}/>
+    }
+
     return (
         <Box sx={{flexGrow: 1}}>
             <AppBar style={{marginBottom: 20}} position="static">
