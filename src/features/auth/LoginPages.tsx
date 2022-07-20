@@ -3,7 +3,9 @@ import {selectIsLoggedIn} from './selectors';
 import {useAppSelector} from '../../utils/redux-utils';
 import {Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, TextField} from '@mui/material';
 import {FormikHelpers, useFormik} from 'formik';
-import {Navigate} from 'react-router-dom';
+import {Navigate, NavLink} from 'react-router-dom';
+import {Login} from '../../component/authFirebase/Login';
+import {PATH} from '../../app/App';
 
 type FormValuesType = {
     email: string
@@ -11,7 +13,7 @@ type FormValuesType = {
     rememberMe: boolean
 }
 
-export const Login = () => {
+export const LoginPages = () => {
     const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
     const formik = useFormik({
@@ -45,6 +47,7 @@ export const Login = () => {
 
     return <Grid container justifyContent="center">
         <Grid item xs={4}>
+            <Login/>
             <form onSubmit={formik.handleSubmit}>
                 <FormControl>
                     <FormLabel>
@@ -86,6 +89,7 @@ export const Login = () => {
                     </FormGroup>
                 </FormControl>
             </form>
+            <NavLink to={PATH.REGISTRATION}> Registration </NavLink>
         </Grid>
     </Grid>
 }

@@ -5,6 +5,7 @@ import {PATH} from '../../app/App';
 import {Button, TextField} from '@mui/material';
 import {useAppSelector} from '../../utils/redux-utils';
 import {selectIsLoggedIn, selectIsRegistered} from './selectors';
+import {SignUp} from '../../component/authFirebase/SignUp';
 
 type FormikErrorType = {
     email?: string
@@ -12,7 +13,7 @@ type FormikErrorType = {
     confirmPassword?: string
 }
 
-export const Registration = () => {
+export const RegisterPages = () => {
     const isLoggedIn = useAppSelector(selectIsLoggedIn);
     const isRegistered = useAppSelector(selectIsRegistered)
 
@@ -63,6 +64,7 @@ export const Registration = () => {
                 <div>
                     <h2> Sing Up</h2>
                 </div>
+                <SignUp/>
                 <div>
                     <form onSubmit={formik.handleSubmit}>
                         <label>Email</label>
