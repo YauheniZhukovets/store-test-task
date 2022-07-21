@@ -3,7 +3,7 @@ import {useFormik} from 'formik';
 import {Navigate, NavLink} from 'react-router-dom';
 import {PATH} from '../../app/App';
 import {Button, TextField} from '@mui/material';
-import {useAppSelector} from '../../utils/redux-utils';
+import {useAppSelector} from '../../hooks/redux-hooks';
 import {selectIsLoggedIn, selectIsRegistered} from './selectors';
 import {SignUp} from '../../component/authFirebase/SignUp';
 

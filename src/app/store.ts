@@ -10,5 +10,5 @@ export const store = configureStore({
 window.store = store;
 
 
-
-
+export type AppDispatch = typeof store.dispatch
+export type AppRootStateType = ReturnType<typeof store.getState>
