@@ -1,40 +1,58 @@
-import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {AxiosError} from 'axios';
+import {getDatabase, onValue, ref} from 'firebase/database';
+
+
+type InitialStteType = {
+    products:Array<ProductType> | null
+}
+const initialState:InitialStteType = {
+    products: []
+}
 
 export const slice = createSlice({
-    name: 'todolists',
-    initialState: [] as any,
+    name: 'catalog',
+    initialState:initialState,
     reducers: {
-        changeTodolistFilterAC: (state, action: PayloadAction<{ id: string }>) => {
-            //const index = state.findIndex(tl => tl.id === action.payload.id)
-           /* if (index > -1) {
-                state[index].filter = action.payload.filter
-            }*/
-        },
+        setCatalog: (state, action) => {
+            state = action.payload
+            console.log(state,"state")
+        }
     },
     extraReducers: (builder) => {
-        builder.addCase(fetchTodolistsTC.fulfilled, (state, action) => {
-            //return action.payload.todolists.map(tl => ({...tl, filter: 'all', entityStatus: 'idle'}))
+        builder.addCase(fetchCatalog.fulfilled, (state, action) => {
+            state.products = action.payload
         })
-    }
+    },
 })
 
 export const catalogReducer = slice.reducer
-export const {changeTodolistFilterAC} = slice.actions
+export const {setCatalog} = slice.actions
 
 // thunks
-const fetchTodolistsTC = createAsyncThunk<any, undefined, any>('todolists/fetchTodolists', async (arg, thunkAPI) => {
-    //const res = await todolistsAPI.getTodolists()
+export const fetchCatalog = createAsyncThunk('catalog/fetchCatalog', async (param, thunkAPI) => {
+    const db = getDatabase();
+    const catalogRef = ref(db, 'catalog');
+    let result = null;
     try {
-       // thunkAPI.dispatch(setAppStatus({status: 'succeeded'}))
-        //return {todolists: res.data}
+        await onValue(catalogRef, (snapshot) => {
+            result = snapshot.val();
+        });
+
     } catch (err) {
-        //const error = err as AxiosError
-        //return handleAsyncServerNetworkError(error, thunkAPI);
+        const error = err as AxiosError
+        console.error(error)
     }
+    return result
 })
 
-
-export const asyncActions = {
-    fetchTodolistsTC,
+type ProductType = {
+    id: number
+    name: string
+    description: string
+    price: number
 }
+
+
+
 

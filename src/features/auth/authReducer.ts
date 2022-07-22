@@ -1,10 +1,11 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword} from 'firebase/auth';
+import {AxiosError} from 'axios';
+
 
 export const slice = createSlice({
     name: 'auth',
     initialState: {
-        isLoggedIn: false,
-        isRegistered: false,
         email: null,
         token: null,
         id: null,
@@ -19,26 +20,45 @@ export const slice = createSlice({
             state.email = null
             state.token = null
             state.id = null
-        },
-        setIsLoggedIn: (state, action: PayloadAction<{ value: boolean }>) => {
-            state.isLoggedIn = action.payload.value
         }
     },
-    extraReducers: (builder) => {
-        /* builder
-             .addCase(login.fulfilled, ((state) => {
-                 state.isLoggedIn = true
-             }))
-             .addCase(logout.fulfilled, ((state) => {
-                 state.isLoggedIn = false
-             }))*/
-    }
 })
 
 export const authReducer = slice.reducer
-export const {setUser,removeUser} = slice.actions
+export const {setUser, removeUser} = slice.actions
 
 // thunks
+export const registerUser = createAsyncThunk('auth/registerUser', async (param: FormValuesType, thunkAPI) => {
+    const auth = getAuth();
+    const res = await createUserWithEmailAndPassword(auth, param.email, param.password)
+    try {
+        thunkAPI.dispatch(setUser({
+            email: res.user.email,
+            id: res.user.uid,
+            token: res.user.refreshToken
+        }))
+    } catch (err) {
+        const error = err as AxiosError
+        console.error(error)
+    }
+})
 
+export const loginUser = createAsyncThunk('auth/loginUser', async (param: FormValuesType, thunkAPI) => {
+    const auth = getAuth();
+    const res = await signInWithEmailAndPassword(auth, param.email, param.password)
+    try {
+        thunkAPI.dispatch(setUser({
+            email: res.user.email,
+            id: res.user.uid,
+            token: res.user.refreshToken
+        }))
+    } catch (err) {
+        const error = err as AxiosError
+        console.error(error)
+    }
+})
 
-
+export type FormValuesType = {
+    email: string
+    password: string
+}

@@ -1,21 +1,15 @@
 import React from 'react';
 import {useFormik} from 'formik';
-import {Navigate, NavLink} from 'react-router-dom';
+import {NavLink, useNavigate} from 'react-router-dom';
 import {PATH} from '../../app/App';
-import {Button, TextField} from '@mui/material';
-import {useAppSelector} from '../../hooks/redux-hooks';
-import {selectIsLoggedIn, selectIsRegistered} from './selectors';
-import {SignUp} from '../../component/authFirebase/SignUp';
+import {Button, FormControl, FormGroup, FormLabel, Grid, TextField} from '@mui/material';
+import {registerUser} from './authReducer';
+import {useAppDispatch} from '../../hooks/redux-hooks';
 
-type FormikErrorType = {
-    email?: string
-    password?: string
-    confirmPassword?: string
-}
 
 export const RegisterPages = () => {
-    const isLoggedIn = useAppSelector(selectIsLoggedIn);
-    const isRegistered = useAppSelector(selectIsRegistered)
+    const dispatch = useAppDispatch()
+    const navigate = useNavigate()
 
     const formik = useFormik({
         initialValues: {
@@ -24,75 +18,64 @@ export const RegisterPages = () => {
             confirmPassword: ''
         },
         validate: (values) => {
-            const errors: FormikErrorType = {};
             if (!values.email) {
-                errors.email = 'Please enter your email Address.';
-            } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-                errors.email = 'Please enter valid email address.';
+                return {
+                    email: 'Email is required'
+                }
             }
-
             if (!values.password) {
-                errors.password = 'Please enter your password.';
-            } else if (values.password.length < 8) {
-                errors.password = 'Password length must be more than 8 characters';
+                return {
+                    password: 'Password is required'
+                }
             }
-
             if (!values.confirmPassword) {
-                errors.confirmPassword = 'Please enter your confirm password.';
-            } else if (values.password !== values.confirmPassword) {
-                errors.confirmPassword = 'Passwords don\'t match.';
+                return {
+                    confirmPassword: 'Confirm password is required'
+                }
             }
-            return errors;
         },
-        onSubmit: (values) => {
-
+        onSubmit: async (values) => {
+            await dispatch(registerUser(values))
+            navigate('/')
         },
     })
 
-    if (isLoggedIn) {
-        return <Navigate to={PATH.CATALOG}/>
-    }
+    return <Grid container justifyContent="center">
+        <Grid item xs={4}>
+            <form onSubmit={formik.handleSubmit}>
+                <FormControl>
+                    <FormLabel>
+                        <p>
+                            Already have an account
+                            <NavLink to={PATH.LOGIN}> Sign in</NavLink>
+                        </p>
+                    </FormLabel>
+                    <FormGroup>
+                        <TextField
+                            label="Email"
+                            margin="normal"
+                            {...formik.getFieldProps('email')}
+                        />
+                        {formik.errors.email ? <div>{formik.errors.email}</div> : null}
+                        <TextField
+                            type="password"
+                            label="Password"
+                            margin="normal"
+                            {...formik.getFieldProps('password')}
+                        />
+                        {formik.errors.password ? <div>{formik.errors.password}</div> : null}
+                        <TextField
+                            type="password"
+                            label="Confirm Password"
+                            margin="normal"
+                            {...formik.getFieldProps('confirmPassword')}
+                        />
+                        {formik.errors.confirmPassword ? <div>{formik.errors.confirmPassword}</div> : null}
 
-    if (isRegistered) {
-        return <Navigate to={PATH.LOGIN}/>
-    }
-    return (
-        <div>
-            <div>
-                <div>
-                </div>
-                <div>
-                    <h2> Sing Up</h2>
-                </div>
-                <SignUp/>
-                <div>
-                    <form onSubmit={formik.handleSubmit}>
-                        <label>Email</label>
-                        <TextField type={'email'}
-                                   placeholder={'Enter your email'}
-                                   {...formik.getFieldProps('email')}
-                        />
-                        <label>Password</label>
-                        <TextField type={'password'}
-                                   placeholder={'Enter your password'}
-                                   {...formik.getFieldProps('password')}
-                        />
-                        <label>Confirm password</label>
-                        <TextField type={'password'}
-                                   placeholder={'Enter your confirm password'}
-                                   {...formik.getFieldProps('confirmPassword')}
-                        />
-                        <div>
-                            <Button type={'submit'}>
-                                Register
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-                <div>
-                    <NavLink to={PATH.LOGIN}> Sign in </NavLink>
-                </div>
-            </div>
-        </div>
-    );
-};
+                        <Button type={'submit'} variant={'contained'} color={'primary'}>Register</Button>
+                    </FormGroup>
+                </FormControl>
+            </form>
+        </Grid>
+    </Grid>
+}
