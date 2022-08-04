@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import {
   Button,
@@ -10,13 +10,28 @@ import {
 } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 
+import { useAppDispatch } from 'hooks/redux-hooks';
+import { addItemInOder, ProductType } from 'store/reducers/catalogReducer';
+
 type ProductPropsType = {
-  name: string;
-  description: string;
-  price: number;
+  product: ProductType;
 };
 
-export const Product = ({ price, name, description }: ProductPropsType) => {
+export const Product: FC<ProductPropsType> = ({ product }) => {
+  const dispatch = useAppDispatch();
+
+  const onAddItemClick = () => {
+    const item = {
+      id: product.id,
+      count: 1,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+    };
+
+    dispatch(addItemInOder(item));
+  };
+
   return (
     <Card style={{ margin: 20 }} sx={{ maxWidth: 345 }}>
       <CardMedia
@@ -27,20 +42,22 @@ export const Product = ({ price, name, description }: ProductPropsType) => {
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {name}
+          {product.name}
         </Typography>
         <Typography gutterBottom variant="h6" component="div">
-          <b>{price} BYN</b>
+          <b>{product.price} BYN</b>
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {description}
+          {product.description}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">
+        <Button onClick={onAddItemClick} size="small">
           <NavLink to="/cart">Buy Now</NavLink>
         </Button>
-        <Button size="small">Add to cart</Button>
+        <Button onClick={onAddItemClick} size="small">
+          Add to cart
+        </Button>
       </CardActions>
     </Card>
   );

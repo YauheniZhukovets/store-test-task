@@ -1,53 +1,35 @@
 import React, { FC } from 'react';
 
-import MenuIcon from '@mui/icons-material/Menu';
-import {
-  AppBar,
-  Box,
-  Button,
-  Container,
-  Grid,
-  IconButton,
-  Toolbar,
-  Typography,
-} from '@mui/material';
-import { NavLink } from 'react-router-dom';
+import { Box, Container, Grid, Typography } from '@mui/material';
+import { Navigate } from 'react-router-dom';
 
 import { DataUser } from './dataUser/DataUser';
 import { ItemsInCart } from './itemInCart/ItemsInCart';
 
-const LENGTH_ARRAY = 20;
-const MULTIPLY_NUM = 10;
+import { PATH } from 'App';
+import { Header } from 'components/header/Header';
+import { useAppSelector } from 'hooks/redux-hooks';
+import { useAuth } from 'hooks/useAuth';
+import { selectOrder } from 'store/selectors/selectors';
+import { sumOrder } from 'utils/sumOrder';
 
 export const Cart: FC = () => {
-  return (
+  const order = useAppSelector(selectOrder);
+
+  const { isAuth } = useAuth();
+
+  return !isAuth ? (
+    <Navigate to={PATH.LOGIN} />
+  ) : (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar style={{ marginBottom: 20 }} position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {/* News */}
-          </Typography>
-          <Button color="inherit">
-            <NavLink to="/">MENU</NavLink>
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <Header url="/" name="MENU" />
 
       <Container>
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2} columns={12}>
-            <Grid item xs={8} style={{ height: '78vh', overflowY: 'auto' }}>
-              {Array.from(Array(LENGTH_ARRAY)).map(() => (
-                <ItemsInCart key={Math.random() * MULTIPLY_NUM} />
+            <Grid item xs={8} style={{ height: '74vh', overflowY: 'auto' }}>
+              {order.map(item => (
+                <ItemsInCart key={item.id} item={item} />
               ))}
             </Grid>
             <Grid item xs={4}>
@@ -55,7 +37,7 @@ export const Cart: FC = () => {
             </Grid>
           </Grid>
           <Typography variant="h6" component="div" style={{ margin: 30 }}>
-            <b>TOTAL: {99999}</b>
+            {order.length !== 0 && <b>TOTAL: {sumOrder(order)}</b>}
           </Typography>
         </Box>
       </Container>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import {
   Box,
@@ -10,7 +10,33 @@ import {
   Typography,
 } from '@mui/material';
 
-export const ItemsInCart = () => {
+import { useAppDispatch } from 'hooks/redux-hooks';
+import {
+  addItemInOder,
+  decrementItemInOder,
+  deleteItemInOder,
+  OrderType,
+} from 'store/reducers/catalogReducer';
+
+export type ItemsInCartPropsType = {
+  item: OrderType;
+};
+
+export const ItemsInCart: FC<ItemsInCartPropsType> = ({ item }) => {
+  const dispatch = useAppDispatch();
+
+  const onAddItemClick = () => {
+    dispatch(addItemInOder(item));
+  };
+
+  const onDecrementItemClick = () => {
+    dispatch(decrementItemInOder(item));
+  };
+
+  const onDeleteItemClick = () => {
+    dispatch(deleteItemInOder(item));
+  };
+
   return (
     <Card style={{ margin: 10, display: 'flex' }}>
       <CardMedia
@@ -21,21 +47,26 @@ export const ItemsInCart = () => {
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Lizard
+          {item.name}
+        </Typography>
+        <Typography gutterBottom variant="h6" component="div">
+          <b>{item.price} BYN</b>
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000 species,
-          ranging across all continents except Antarctica
+          {item.description}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">
+        <Button
+          onClick={item.count > 1 ? onDecrementItemClick : onDeleteItemClick}
+          size="small"
+        >
           <b>-</b>
         </Button>
         <Box>
-          <b>12</b>
+          <b>{item.count}</b>
         </Box>
-        <Button size="small">
+        <Button onClick={onAddItemClick} size="small">
           <b>+</b>
         </Button>
       </CardActions>
